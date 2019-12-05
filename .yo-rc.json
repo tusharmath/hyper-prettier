@@ -1,0 +1,9 @@
+{
+  "generator-kips": {
+    "promptValues": {
+      "projectName": "hyper-prettier",
+      "projectDescription": "Prettier on steroids",
+      "keywords": "prettier worker performance"
+    }
+  }
+}
