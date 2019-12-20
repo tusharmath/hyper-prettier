@@ -2,7 +2,7 @@ import {QIO, testRuntime} from '@qio/core'
 import {spy} from 'chai'
 import * as prettier from 'prettier'
 
-import {prettify} from '../src/Prettify'
+import {format} from '../src/Formatter'
 
 const mockFS = (content: string) => {
   const writeFile = spy(() => {})
@@ -19,13 +19,13 @@ const mockFS = (content: string) => {
   }
 }
 
-describe('prettify', () => {
+describe('format', () => {
   const TEST_FILE_CONTENT = 'const A =    1000'
 
   it('should prettify files', () => {
     const fs = mockFS(TEST_FILE_CONTENT)
     testRuntime().unsafeExecuteSync(
-      prettify('./xyz', {parser: 'typescript'}).provide({fs})
+      format('./xyz', {parser: 'typescript'}).provide({fs})
     )
 
     fs.__spy__.writeFile.should.have.been.called.with(

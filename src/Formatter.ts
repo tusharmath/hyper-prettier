@@ -14,7 +14,7 @@ const readFile = (fd: number) =>
 /**
  * Reads the file at the provided path and tries to format it
  */
-export const prettify = (path: string, options?: prettier.Options) =>
+export const format = (path: string, options?: prettier.Options) =>
   open(path, 'w').bracket(close)(fd =>
     readFile(fd)
       .map(buffer => prettier.format(buffer.toString(), options))
