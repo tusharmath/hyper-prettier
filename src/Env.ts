@@ -47,3 +47,27 @@ export interface EnvMasterProgram {
 export interface EnvWorkerProgram {
   workerProgram(): QIO<void>
 }
+
+export interface EnvFSOpen {
+  fs: {
+    open(path: string, mode: string): QIO<number, NodeJS.ErrnoException>
+  }
+}
+
+export interface EnvFSClose {
+  fs: {
+    close(fd: number): QIO<void, NodeJS.ErrnoException>
+  }
+}
+
+export interface EnvFSWriteFile {
+  fs: {
+    writeFile(fd: number, content: Buffer): QIO<void, NodeJS.ErrnoException>
+  }
+}
+
+export interface EnvFSReadFile {
+  fs: {
+    readFile(fd: number): QIO<Buffer, NodeJS.ErrnoException>
+  }
+}
