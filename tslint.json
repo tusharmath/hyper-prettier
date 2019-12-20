@@ -5,11 +5,15 @@
     "no-unbound-method": {
       "options": ["ignore-static"]
     },
-    "typedef": [true, "call-signature", "parameter", "arrow-call-signature"],
+    "typedef": [true, "parameter"],
     "no-parameter-properties": false,
     "no-implicit-dependencies": [true, "dev"],
+    "max-classes-per-file": false,
+    "file-name-casing": [true, "pascal-case"],
+    "match-default-export-name": false,
+    "no-magic-numbers": false,
     "completed-docs": [
-      true,
+      false,
       {
         "enums": true,
         "functions": true,
@@ -22,7 +26,10 @@
         "types": true,
         "variables": true
       }
-    ]
+    ],
+    "interface-name": false,
+    "no-empty": false
   },
-  "rulesDirectory": []
+  "rulesDirectory": [],
+  "linterOptions": {"exclude": ["node_modules"]}
 }

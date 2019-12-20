@@ -8,3 +8,6 @@ node_modules/
 *.log
 docs/
 *.tsbuildinfo
+*.todo
+.vscode/
+.metals/

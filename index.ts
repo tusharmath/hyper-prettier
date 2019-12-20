@@ -1,1 +1,1 @@
-export {HyperPrettier} from './src/HyperPrettier'
+export * from './src/HPrettier'
