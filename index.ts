@@ -1,2 +1,2 @@
 /* tslint:disable */
-export * from './src/HPrettier'
+export * from './src/MasterProgram'

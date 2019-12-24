@@ -1,10 +1,11 @@
 import {QIO, testRuntime} from '@qio/core'
 import {assert, spy} from 'chai'
 
-import {onMaster, onWorker} from '../src/HPrettier'
+import {masterProgram} from '../src/MasterProgram'
 import {MasterSocket} from '../src/QMasterSocket'
 import {QWorker} from '../src/QWorker'
 import {WorkerSocket} from '../src/QWorkerSocket'
+import {workerProgram} from '../src/WorkerProgram'
 
 const fork = (): QWorker => ({kill: () => {}})
 const masterSocket = QIO.encase(
@@ -54,7 +55,7 @@ describe('HPrettier', () => {
     it('should start the program', () => {
       const L = logger()
       testRuntime().unsafeExecuteSync(
-        onMaster([], 1).provide({
+        masterProgram([], 1).provide({
           cluster: {
             fork,
             masterSocket
@@ -78,7 +79,7 @@ describe('HPrettier', () => {
     it('should create 4 workers', () => {
       const L = logger()
       testRuntime().unsafeExecuteSync(
-        onMaster([], 4).provide({
+        masterProgram([], 4).provide({
           cluster: {
             fork,
             masterSocket
@@ -105,7 +106,7 @@ describe('HPrettier', () => {
     it('should send 2 files', () => {
       const L = logger()
       testRuntime().unsafeExecuteSync(
-        onMaster(['A', 'B', 'C'], 1).provide({
+        masterProgram(['A', 'B', 'C'], 1).provide({
           cluster: {
             fork,
             masterSocket
@@ -134,7 +135,7 @@ describe('HPrettier', () => {
     it('should start the program', () => {
       const L = logger()
       testRuntime().unsafeExecuteSync(
-        onWorker().provide({
+        workerProgram().provide({
           cluster: {
             workerSocket: () => workerSocket(['A', 'B', 'C'])
           },
@@ -157,7 +158,7 @@ describe('HPrettier', () => {
     it('should open socket', () => {
       const L = logger()
       testRuntime().unsafeExecuteSync(
-        onWorker().provide({
+        workerProgram().provide({
           cluster: {
             workerSocket: () => workerSocket(['A', 'B', 'C'])
           },
@@ -180,7 +181,7 @@ describe('HPrettier', () => {
     it('should format the files', () => {
       const format = spy()
       testRuntime().unsafeExecuteSync(
-        onWorker().provide({
+        workerProgram().provide({
           cluster: {
             workerSocket: () => workerSocket(['A', 'B', 'C'])
           },
