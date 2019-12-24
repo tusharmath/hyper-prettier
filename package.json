@@ -18,6 +18,7 @@
     "type": "git",
     "url": "https://github.com/tusharmath/hyper-prettier.git"
   },
+  "bin": "bin/hPrettier",
   "scripts": {
     "create-docs": "typedoc",
     "lint": "tslint --project .",
