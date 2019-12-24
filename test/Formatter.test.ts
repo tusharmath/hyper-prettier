@@ -1,6 +1,7 @@
 import {QIO, testRuntime} from '@qio/core'
 import {spy} from 'chai'
 import * as prettier from 'prettier'
+import {testScheduler} from 'ts-scheduler'
 
 import {format} from '../src/Formatter'
 
@@ -24,7 +25,7 @@ describe('format', () => {
 
   it('should prettify files', () => {
     const fs = mockFS(TEST_FILE_CONTENT)
-    testRuntime().unsafeExecuteSync(
+    testRuntime(testScheduler({bailout: 200})).unsafeExecuteSync(
       format('./xyz', {parser: 'typescript'}).provide({fs})
     )
 

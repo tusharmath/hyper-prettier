@@ -1,5 +1,5 @@
 import {QIO, testRuntime} from '@qio/core'
-import {assert} from 'chai'
+import {assert, spy} from 'chai'
 
 import {onMaster, onWorker} from '../src/HPrettier'
 import {MasterSocket} from '../src/QMasterSocket'
@@ -138,6 +138,9 @@ describe('HPrettier', () => {
           cluster: {
             workerSocket: () => workerSocket(['A', 'B', 'C'])
           },
+          formatter: {
+            format: QIO.void
+          },
           logger: L
         })
       )
@@ -158,6 +161,9 @@ describe('HPrettier', () => {
           cluster: {
             workerSocket: () => workerSocket(['A', 'B', 'C'])
           },
+          formatter: {
+            format: QIO.void
+          },
           logger: L
         })
       )
@@ -169,6 +175,23 @@ describe('HPrettier', () => {
         'HPrettier . data:                B',
         'HPrettier . data:                C'
       ])
+    })
+
+    it('should format the files', () => {
+      const format = spy()
+      testRuntime().unsafeExecuteSync(
+        onWorker().provide({
+          cluster: {
+            workerSocket: () => workerSocket(['A', 'B', 'C'])
+          },
+          formatter: {
+            format: QIO.encase(format)
+          },
+          logger: {log: () => QIO.void}
+        })
+      )
+
+      format.should.be.called.with('A')
     })
   })
 })

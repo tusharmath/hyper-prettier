@@ -4,6 +4,7 @@ import {Stream} from '@qio/stream'
 import {D} from './Debug'
 import {
   EnvForker,
+  EnvFormatter,
   EnvMaster,
   EnvMasterProgram,
   EnvMasterSocket,
@@ -18,11 +19,7 @@ const IPC_ADDRESS = 'ipc:///tmp/sock.ipc'
 const DM = (msg: string, action: string) =>
   D('*', `${msg}:`.padEnd(20, ' '), action.toUpperCase())
 const DW = (msg: string, action: string) =>
-  D(
-    '.',
-    `${msg}:`.padEnd(20, ' '),
-    action.toUpperCase()
-  )
+  D('.', `${msg}:`.padEnd(20, ' '), action.toUpperCase())
 
 // Env Helpers
 const masterSocket = QIO.accessM((_: EnvMasterSocket) =>
@@ -37,6 +34,8 @@ const getMasterProgram = (filePaths: string[], concurrency: number) =>
   QIO.accessM((_: EnvMasterProgram) => _.masterProgram(filePaths, concurrency))
 const getWorkerProgram = () =>
   QIO.accessM((_: EnvWorkerProgram) => _.workerProgram())
+const format = (path: string) =>
+  QIO.accessM((_: EnvFormatter) => _.formatter.format(path))
 
 // Sockets
 const mMasterSocket = Managed.make(
@@ -86,7 +85,7 @@ export const onWorker = () =>
       mWorkerSocket.use(
         S =>
           Stream.produce(S.receive).mapM(buffer =>
-            DW('data', buffer.toString())
+            format(buffer.toString()).and(DW('data', buffer.toString()))
           ).drain
       )
     )
