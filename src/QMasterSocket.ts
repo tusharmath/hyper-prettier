@@ -12,7 +12,7 @@ export class QMasterSocket implements MasterSocket {
     return QIO.lift(() => new QMasterSocket())
   }
 
-  private readonly socket = new mq.Push()
+  private readonly socket = new mq.Request()
   public bind(address: string): QIO<void, Error> {
     return QIO.tryP(() => this.socket.bind(address))
   }

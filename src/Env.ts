@@ -1,5 +1,4 @@
-import {Managed, QIO} from '@qio/core'
-import {Stream} from '@qio/stream'
+import {QIO} from '@qio/core'
 
 import {MasterSocket} from './QMasterSocket'
 import {QWorker} from './QWorker'
@@ -52,12 +51,6 @@ export interface EnvWorkerProgram {
 export interface EnvFormatter {
   formatter: {
     format(path: string): QIO<void, NodeJS.ErrnoException>
-  }
-}
-
-export interface EnvStdin {
-  stdin: {
-    data: QIO<Managed<Stream<Buffer>>>
   }
 }
 

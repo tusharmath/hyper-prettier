@@ -5,6 +5,7 @@ export interface WorkerSocket {
   close: QIO<void>
   receive: QIO<Buffer[], Error>
   connect(address: string): QIO<void>
+  send(msg: Buffer): QIO<void, Error>
 }
 
 export class QWorkerSocket implements WorkerSocket {
@@ -12,7 +13,7 @@ export class QWorkerSocket implements WorkerSocket {
     return QIO.lift(() => new QWorkerSocket())
   }
 
-  private readonly socket = new mq.Pull()
+  private readonly socket = new mq.Reply()
 
   public get close() {
     return QIO.lift(() => {
@@ -28,5 +29,9 @@ export class QWorkerSocket implements WorkerSocket {
 
   public get receive() {
     return QIO.tryP(() => this.socket.receive())
+  }
+
+  public send(msg: Buffer) {
+    return QIO.tryP(() => this.socket.send(msg))
   }
 }
