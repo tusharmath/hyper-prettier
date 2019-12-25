@@ -4,6 +4,8 @@ import {assert, spy} from 'chai'
 import {WorkerSocket} from '../src/QWorkerSocket'
 import {workerProgram} from '../src/WorkerProgram'
 
+import {testLogger} from './internal/TestLogger'
+
 const workerSocket = QIO.encase(
   (msg: string[]): WorkerSocket => {
     const m = msg.slice(0)
@@ -21,81 +23,62 @@ const workerSocket = QIO.encase(
               : QIO.never()
           })
         )
-      }
+      },
+      send: QIO.void
     }
   }
 )
-const logger = (regex: RegExp = /.*/) => {
-  const log = new Array<string>()
-
-  return {
-    get stdout() {
-      return log.filter(_ => _.match(regex))
-    },
-    log: (scope: string) => (...t: unknown[]) => {
-      log.push([scope, ...t].join(' '))
-    }
-  }
+const env = {
+  cluster: {
+    workerSocket: () => workerSocket(['A', 'B', 'C'])
+  },
+  formatter: {
+    format: QIO.void
+  },
+  logger: testLogger(),
+  worker: {id: QIO.resolve(0)}
 }
 describe('workerProgram', () => {
   it('should start the program', () => {
-    const L = logger()
+    const L = testLogger()
     testRuntime().unsafeExecuteSync(
-      workerProgram().provide({
-        cluster: {
-          workerSocket: () => workerSocket(['A', 'B', 'C'])
-        },
-        formatter: {
-          format: QIO.void
-        },
-        logger: L
-      })
+      workerProgram().provide({...env, logger: L})
     )
 
     assert.deepStrictEqual(L.stdout, [
-      'HPrettier . program:             START',
-      'HPrettier . socket:              ACQUIRED',
-      'HPrettier . data:                A',
-      'HPrettier . data:                B',
-      'HPrettier . data:                C'
+      'HPrettierWorkerProgram_000 program: START',
+      'HPrettierWorkerProgram_000 socket: ACQUIRED',
+      'HPrettierWorkerProgram_000 recv: A',
+      'HPrettierWorkerProgram_000 format: A OK',
+      'HPrettierWorkerProgram_000 recv: B',
+      'HPrettierWorkerProgram_000 format: B OK',
+      'HPrettierWorkerProgram_000 recv: C',
+      'HPrettierWorkerProgram_000 format: C OK'
     ])
   })
 
   it('should open socket', () => {
-    const L = logger()
+    const L = testLogger()
     testRuntime().unsafeExecuteSync(
-      workerProgram().provide({
-        cluster: {
-          workerSocket: () => workerSocket(['A', 'B', 'C'])
-        },
-        formatter: {
-          format: QIO.void
-        },
-        logger: L
-      })
+      workerProgram().provide({...env, logger: L})
     )
 
     assert.deepStrictEqual(L.stdout, [
-      'HPrettier . program:             START',
-      'HPrettier . socket:              ACQUIRED',
-      'HPrettier . data:                A',
-      'HPrettier . data:                B',
-      'HPrettier . data:                C'
+      'HPrettierWorkerProgram_000 program: START',
+      'HPrettierWorkerProgram_000 socket: ACQUIRED',
+      'HPrettierWorkerProgram_000 recv: A',
+      'HPrettierWorkerProgram_000 format: A OK',
+      'HPrettierWorkerProgram_000 recv: B',
+      'HPrettierWorkerProgram_000 format: B OK',
+      'HPrettierWorkerProgram_000 recv: C',
+      'HPrettierWorkerProgram_000 format: C OK'
     ])
   })
 
   it('should format the files', () => {
     const format = spy()
     testRuntime().unsafeExecuteSync(
-      workerProgram().provide({
-        cluster: {
-          workerSocket: () => workerSocket(['A', 'B', 'C'])
-        },
-        formatter: {
-          format: QIO.encase(format)
-        },
-        logger: {log: () => QIO.void}
-      })
+      workerProgram().provide({...env, formatter: {format: QIO.encase(format)}})
     )
 
     format.should.be.called.with('A')

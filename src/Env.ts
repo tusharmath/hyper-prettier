@@ -25,7 +25,7 @@ export interface EnvWorkerSocket {
 
 export interface EnvForker {
   cluster: {
-    fork(): QWorker
+    fork(env?: {}): QWorker
   }
 }
 
@@ -58,5 +58,11 @@ export interface EnvFormatter {
 export interface EnvStdin {
   stdin: {
     data: QIO<Managed<Stream<Buffer>>>
+  }
+}
+
+export interface EnvWorkerId {
+  worker: {
+    id: QIO<number>
   }
 }

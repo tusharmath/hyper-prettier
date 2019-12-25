@@ -5,6 +5,8 @@ import {masterProgram} from '../src/MasterProgram'
 import {MasterSocket} from '../src/QMasterSocket'
 import {QWorker} from '../src/QWorker'
 
+import {testLogger} from './internal/TestLogger'
+
 const fork = (): QWorker => ({kill: () => {}})
 const masterSocket = QIO.encase(
   (): MasterSocket => ({
@@ -13,94 +15,83 @@ const masterSocket = QIO.encase(
     send: message => QIO.void()
   })
 )
-const logger = (regex: RegExp = /.*/) => {
-  const log = new Array<string>()
-
-  return {
-    get stdout() {
-      return log.filter(_ => _.match(regex))
-    },
-    log: (scope: string) => (...t: unknown[]) => {
-      log.push([scope, ...t].join(' '))
-    }
+const env = {
+  cluster: {
+    fork,
+    masterSocket
+  },
+  logger: testLogger(),
+  worker: {
+    id: QIO.resolve(100)
   }
 }
 describe('masterProgram', () => {
   it('should start the program', () => {
-    const L = logger()
+    const L = testLogger()
     testRuntime().unsafeExecuteSync(
       masterProgram([], 1).provide({
-        cluster: {
-          fork,
-          masterSocket
-        },
+        ...env,
         logger: L
       })
     )
 
     assert.deepStrictEqual(L.stdout, [
-      'HPrettier * program:             START',
-      'HPrettier * concurrency:         1',
-      'HPrettier * process:             FORK',
-      'HPrettier * worker pool:         1 OK',
-      'HPrettier * socket:              ACQUIRED',
-      'HPrettier * file count:          0',
-      'HPrettier * file sent:           0',
-      'HPrettier * socket:              RELEASED'
+      'HPrettierMasterProgram_100 program: START',
+      'HPrettierMasterProgram_100 concurrency: 1',
+      'HPrettierMasterProgram_100 process: FORK',
+      'HPrettierMasterProgram_100 worker pool: 1 OK',
+      'HPrettierMasterProgram_100 socket: ACQUIRED',
+      'HPrettierMasterProgram_100 file count: 0',
+      'HPrettierMasterProgram_100 file sent: 0',
+      'HPrettierMasterProgram_100 socket: RELEASED'
     ])
   })
 
   it('should create 4 workers', () => {
-    const L = logger()
+    const L = testLogger()
     testRuntime().unsafeExecuteSync(
       masterProgram([], 4).provide({
-        cluster: {
-          fork,
-          masterSocket
-        },
+        ...env,
         logger: L
       })
     )
 
     assert.deepStrictEqual(L.stdout, [
-      'HPrettier * program:             START',
-      'HPrettier * concurrency:         4',
-      'HPrettier * process:             FORK',
-      'HPrettier * process:             FORK',
-      'HPrettier * process:             FORK',
-      'HPrettier * process:             FORK',
-      'HPrettier * worker pool:         4 OK',
-      'HPrettier * socket:              ACQUIRED',
-      'HPrettier * file count:          0',
-      'HPrettier * file sent:           0',
-      'HPrettier * socket:              RELEASED'
+      'HPrettierMasterProgram_100 program: START',
+      'HPrettierMasterProgram_100 concurrency: 4',
+      'HPrettierMasterProgram_100 process: FORK',
+      'HPrettierMasterProgram_100 process: FORK',
+      'HPrettierMasterProgram_100 process: FORK',
+      'HPrettierMasterProgram_100 process: FORK',
+      'HPrettierMasterProgram_100 worker pool: 4 OK',
+      'HPrettierMasterProgram_100 socket: ACQUIRED',
+      'HPrettierMasterProgram_100 file count: 0',
+      'HPrettierMasterProgram_100 file sent: 0',
+      'HPrettierMasterProgram_100 socket: RELEASED'
     ])
   })
 
   it('should send 2 files', () => {
-    const L = logger()
+    const L = testLogger()
     testRuntime().unsafeExecuteSync(
       masterProgram(['A', 'B', 'C'], 1).provide({
-        cluster: {
-          fork,
-          masterSocket
-        },
+        ...env,
         logger: L
       })
     )
 
     assert.deepStrictEqual(L.stdout, [
-      'HPrettier * program:             START',
-      'HPrettier * concurrency:         1',
-      'HPrettier * process:             FORK',
-      'HPrettier * worker pool:         1 OK',
-      'HPrettier * socket:              ACQUIRED',
-      'HPrettier * file count:          3',
-      'HPrettier * send:                A',
-      'HPrettier * send:                B',
-      'HPrettier * send:                C',
-      'HPrettier * file sent:           3',
-      'HPrettier * socket:              RELEASED'
+      'HPrettierMasterProgram_100 program: START',
+      'HPrettierMasterProgram_100 concurrency: 1',
+      'HPrettierMasterProgram_100 process: FORK',
+      'HPrettierMasterProgram_100 worker pool: 1 OK',
+      'HPrettierMasterProgram_100 socket: ACQUIRED',
+      'HPrettierMasterProgram_100 file count: 3',
+      'HPrettierMasterProgram_100 send: A',
+      'HPrettierMasterProgram_100 send: B',
+      'HPrettierMasterProgram_100 send: C',
+      'HPrettierMasterProgram_100 file sent: 3',
+      'HPrettierMasterProgram_100 socket: RELEASED'
     ])
   })
 })

@@ -1,13 +1,11 @@
 import {Managed, QIO} from '@qio/core'
 import {Stream} from '@qio/stream'
 
-import {D} from './Debug'
 import {EnvFormatter, EnvWorkerSocket} from './Env'
+import {logger} from './Logger'
+import {IPC_ADDRESS} from './MasterProgram'
 
-// Constants
-const IPC_ADDRESS = 'ipc:///tmp/sock.ipc'
-const DW = (msg: string, action: string) =>
-  D('.', `${msg}:`.padEnd(20, ' '), action.toUpperCase())
+const log = logger('WorkerProgram')
 
 // Env Helpers
 const workerSocket = QIO.accessM((_: EnvWorkerSocket) =>
@@ -19,18 +17,22 @@ const format = (path: string) =>
 const mWorkerSocket = Managed.make(
   workerSocket
     .chain(S => S.connect(IPC_ADDRESS).const(S))
-    .do(DW('socket', 'ACQUIRED')),
-  s => s.close.do(DW('socket', 'RELEASED'))
+    .do(log('socket', 'ACQUIRED')),
+  s => s.close.do(log('socket', 'RELEASED'))
 )
 
 export const workerProgram = () =>
-  DW('program', 'START')
+  log('program', 'START')
     .and(
       mWorkerSocket.use(
         S =>
-          Stream.produce(S.receive).mapM(buffer =>
-            format(buffer.toString()).and(DW('data', buffer.toString()))
-          ).drain
+          Stream.produce(S.receive).mapM(buffer => {
+            const path = buffer.toString()
+
+            return log('recv', path)
+              .and(format(path))
+              .and(log('format', `${path} OK`))
+          }).drain
       )
     )
-    .catch(err => DW('error', err.message))
+    .catch(err => log('ERROR', err.message))
