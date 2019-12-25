@@ -1,22 +1,17 @@
-import {defaultRuntime, Managed, QIO} from '@qio/core'
+import {defaultRuntime, QIO} from '@qio/core'
 import {FSEnv} from '@qio/fs'
 import {Stream} from '@qio/stream'
 import * as cl from 'cluster'
 import debug from 'debug'
-import * as p from 'path'
 
 import {format} from './Formatter'
-import {masterProgram, WORKER_ID_ENV} from './MasterProgram'
+import {masterProgram} from './MasterProgram'
 import {program} from './Program'
 import {QMasterSocket} from './QMasterSocket'
 import {QWorkerSocket} from './QWorkerSocket'
+import {workerId} from './WorkerId'
 import {workerProgram} from './WorkerProgram'
 
-const workerId = QIO.lift(() => {
-  const env = Number(process.env[WORKER_ID_ENV])
-
-  return Number.isFinite(env) ? Number(env) : 100
-})
 defaultRuntime().unsafeExecute(
   program(2).provide({
     cluster: {isMaster: cl.isMaster},
@@ -31,34 +26,7 @@ defaultRuntime().unsafeExecute(
       }
     }),
     stdin: {
-      data: QIO.resolve(
-        Managed.make(
-          QIO.resolve(
-            Stream.of(
-              Buffer.from(
-                [
-                  p.resolve(
-                    process.cwd(),
-                    '../mobile-web-dream11',
-                    'd11-chai/does-not-contain-action.test.ts'
-                  ),
-                  p.resolve(
-                    process.cwd(),
-                    '../mobile-web-dream11',
-                    'd11-chai/does-not-trigger-action.ts'
-                  ),
-                  p.resolve(
-                    process.cwd(),
-                    '../mobile-web-dream11',
-                    'd11-chai/has-action.ts'
-                  )
-                ].join('\n')
-              )
-            )
-          ),
-          QIO.void
-        )
-      )
+      data: Stream.fromEventEmitter(process, 'data')
     },
     workerProgram: QIO.pipeEnv(workerProgram, {
       cluster: {

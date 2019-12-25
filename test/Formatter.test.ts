@@ -7,6 +7,7 @@ import {format} from '../src/Formatter'
 
 import {testLogger} from './internal/TestLogger'
 
+const TEST_FILE_CONTENT = 'const A =    1000'
 const mockFS = (content: string) => {
   const writeFile = spy(() => {})
   const readFile = spy(() => Buffer.from(content))
@@ -21,44 +22,76 @@ const mockFS = (content: string) => {
     writeFile: QIO.encase(writeFile)
   }
 }
-
-const worker = {id: QIO.resolve(1)}
+const mockEnv = (_: {content: string} = {content: TEST_FILE_CONTENT}) => ({
+  fs: mockFS(_.content),
+  logger: testLogger(),
+  worker: {id: QIO.resolve(1)}
+})
 
 describe('format', () => {
-  const TEST_FILE_CONTENT = 'const A =    1000'
-
   it('should prettify files', () => {
-    const fs = mockFS(TEST_FILE_CONTENT)
+    const env = mockEnv()
     testRuntime(testScheduler({bailout: 200})).unsafeExecuteSync(
-      format('./xyz.ts').provide({fs, logger: testLogger(), worker})
+      format('./xyz.ts').provide(env)
     )
 
-    fs.__spy__.writeFile.should.have.been.called.with(
+    env.fs.__spy__.writeFile.should.have.been.first.called.with(
       10,
-      Buffer.from(
-        prettier.format(TEST_FILE_CONTENT, {
-          filepath: './xyz.ts'
-        })
-      )
+      prettier.format(TEST_FILE_CONTENT, {
+        filepath: './xyz.ts'
+      })
     )
   })
 
-  it('should log input files', () => {
-    const logger = testLogger()
+  it('should open file with w+', () => {
+    const env = mockEnv()
     testRuntime(testScheduler({bailout: 200})).unsafeExecuteSync(
-      format('./xyz.ts').provide({
-        fs: mockFS(TEST_FILE_CONTENT),
-        logger,
-        worker
-      })
+      format('./xyz.ts').provide(env)
+    )
+    env.fs.__spy__.open.should.have.been.first.called.with('./xyz.ts', 'w+')
+  })
+
+  it('should log input files', () => {
+    const env = mockEnv()
+    testRuntime(testScheduler({bailout: 200})).unsafeExecuteSync(
+      format('./xyz.ts').provide(env)
     )
 
-    assert.deepStrictEqual(logger.stdout, [
+    assert.deepStrictEqual(env.logger.stdout, [
       'HPrettierFormatter_001 path: ./xyz.ts',
       'HPrettierFormatter_001 fs.open: 10 ./xyz.ts',
       'HPrettierFormatter_001 fs.readFile: 10 ./xyz.ts',
-      'HPrettierFormatter_001 fs.close: 10 ./xyz.ts',
-      'HPrettierFormatter_001 format: ./xyz.ts OK'
+      'HPrettierFormatter_001 format: ./xyz.ts OK',
+      'HPrettierFormatter_001 fs.close: 10 ./xyz.ts'
     ])
+  })
+
+  context('already formatted', () => {
+    it('should not write', () => {
+      const env = mockEnv({
+        content: prettier.format('const A = () => 10', {parser: 'typescript'})
+      })
+      testRuntime(testScheduler({bailout: 200})).unsafeExecuteSync(
+        format('./xyz.ts').provide(env)
+      )
+      env.fs.__spy__.writeFile.should.not.be.called()
+    })
+
+    it('should log input files', () => {
+      const env = mockEnv({
+        content: prettier.format('const A = () => 10', {parser: 'typescript'})
+      })
+      testRuntime(testScheduler({bailout: 200})).unsafeExecuteSync(
+        format('./xyz.ts').provide(env)
+      )
+
+      assert.deepStrictEqual(env.logger.stdout, [
+        'HPrettierFormatter_001 path: ./xyz.ts',
+        'HPrettierFormatter_001 fs.open: 10 ./xyz.ts',
+        'HPrettierFormatter_001 fs.readFile: 10 ./xyz.ts',
+        'HPrettierFormatter_001 format: ./xyz.ts SKIP',
+        'HPrettierFormatter_001 fs.close: 10 ./xyz.ts'
+      ])
+    })
   })
 })

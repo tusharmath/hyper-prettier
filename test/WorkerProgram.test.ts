@@ -81,6 +81,6 @@ describe('workerProgram', () => {
       workerProgram().provide({...env, formatter: {format: QIO.encase(format)}})
     )
 
-    format.should.be.called.with('A')
+    format.should.have.been.first.called.with('A')
   })
 })
