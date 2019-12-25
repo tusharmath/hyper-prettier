@@ -32,6 +32,7 @@ export const workerProgram = () =>
             return log('recv', path)
               .and(format(path))
               .and(log('format', `${path} OK`))
+              .and(S.send('1'))
           }).drain
       )
     )

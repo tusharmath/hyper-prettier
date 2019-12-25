@@ -12,7 +12,7 @@ const masterSocket = QIO.encase(
   (): MasterSocket => ({
     bind: address => QIO.void(),
     close: QIO.void(),
-    send: message => QIO.void()
+    send: message => QIO.resolve([])
   })
 )
 const env = {

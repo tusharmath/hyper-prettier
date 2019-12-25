@@ -5,7 +5,7 @@ export interface WorkerSocket {
   close: QIO<void>
   receive: QIO<Buffer[], Error>
   connect(address: string): QIO<void>
-  send(msg: Buffer): QIO<void, Error>
+  send(msg: string): QIO<void, Error>
 }
 
 export class QWorkerSocket implements WorkerSocket {
@@ -31,7 +31,7 @@ export class QWorkerSocket implements WorkerSocket {
     return QIO.tryP(() => this.socket.receive())
   }
 
-  public send(msg: Buffer) {
+  public send(msg: string) {
     return QIO.tryP(() => this.socket.send(msg))
   }
 }

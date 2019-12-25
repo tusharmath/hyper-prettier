@@ -4,7 +4,7 @@ import * as mq from 'zeromq'
 export interface MasterSocket {
   close: QIO<void>
   bind(address: string): QIO<void, Error>
-  send(message: string): QIO<void, Error>
+  send(message: string): QIO<Buffer[], Error>
 }
 
 export class QMasterSocket implements MasterSocket {
@@ -12,7 +12,7 @@ export class QMasterSocket implements MasterSocket {
     return QIO.lift(() => new QMasterSocket())
   }
 
-  private readonly socket = new mq.Request()
+  private readonly socket = new mq.Request({receiveHighWaterMark: Infinity})
   public bind(address: string): QIO<void, Error> {
     return QIO.tryP(() => this.socket.bind(address))
   }
@@ -22,6 +22,8 @@ export class QMasterSocket implements MasterSocket {
     })
   }
   public send(message: string) {
-    return QIO.tryP(() => this.socket.send(message))
+    return QIO.tryP(() =>
+      this.socket.send(message).then(() => this.socket.receive())
+    )
   }
 }
