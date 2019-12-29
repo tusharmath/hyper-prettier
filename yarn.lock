@@ -783,30 +783,30 @@
   dependencies:
     "@types/node" ">= 8"
 
-"@qio/console@^29.0.5":
-  version "29.0.5"
-  resolved "https://registry.yarnpkg.com/@qio/console/-/console-29.0.5.tgz#a072439bc5f1fe59bf84494f61995459520d29ca"
-  integrity sha512-zVBEbmWxe+klII0J9ShW3a+BAbKz/e/Chv7YfwqwJoOQ+zBx97jXl+i2hv7nU1L1rlg9V8cUCOIToC4stxIWjA==
+"@qio/console@^29.2.1":
+  version "29.2.1"
+  resolved "https://registry.yarnpkg.com/@qio/console/-/console-29.2.1.tgz#b42eb50448bad78978b6fd23d99bb5ddf03722d7"
+  integrity sha512-4QRMRC3PB07osFS+QZUMNwDLRYKAA9o/pwRU84Nkfv//FG8USSMUZgyJPUJzhkLhZ6rHrLTcS2bLOPWIZjHGOw==
   dependencies:
-    "@qio/core" "^29.0.5"
+    "@qio/core" "^29.2.1"
 
-"@qio/core@^29.0.5":
-  version "29.0.5"
-  resolved "https://registry.yarnpkg.com/@qio/core/-/core-29.0.5.tgz#83e03603884bb98162d1927d293c917714a227ba"
-  integrity sha512-Em2VriCv65d1Eik9cMvS9wZXYXnKpvWJ53rUfbXWOZW3EHkKixa25qWdsZwB8aCdkjiSI5HJ0zOGhux5gzimOQ==
+"@qio/core@^29.2.1":
+  version "29.2.1"
+  resolved "https://registry.yarnpkg.com/@qio/core/-/core-29.2.1.tgz#3954eaa450c334d19c3318cb7f80333b0fdeb1c8"
+  integrity sha512-iSCn5I649zui03jlMGEKsu82GxELK4a+zfHhouMQ43/lVDZKTPtvpGme/bUPOlyt6wJXnlYoTPHAQk3pZ9up5w==
   dependencies:
     "@qio/prelude" "^29.0.5"
     debug "^4.1.1"
     in-node "^1.0.0"
     standard-data-structures "^4.0.0"
-    ts-scheduler "^8.0.3"
+    ts-scheduler "^8.0.4"
 
-"@qio/fs@^29.0.5":
-  version "29.0.5"
-  resolved "https://registry.yarnpkg.com/@qio/fs/-/fs-29.0.5.tgz#0cc6fc07b9e5c101431318ee0d1839e424c6cedd"
-  integrity sha512-rAie0Y4YtEgs7ESFCQEB9jTVk5jdqnXa1c6o9DD7gOVmeeAa3XaGZO8lAo5nRV4NjLG86K6tN8D4JqNMzz1dZQ==
+"@qio/fs@^29.2.1":
+  version "29.2.1"
+  resolved "https://registry.yarnpkg.com/@qio/fs/-/fs-29.2.1.tgz#bbdec2ad82aa33c6617b3e80bf9b90542c88c06a"
+  integrity sha512-Eb+owBuEF6TeWD2EKhJgFkz4gWgMUmgGdwRDdrfNQLeNxmw9CdPSL/CviUuwj3nIDnXlLfLcw9h0l16RDTw0Pg==
   dependencies:
-    "@qio/core" "^29.0.5"
+    "@qio/core" "^29.2.1"
     chai "^4.2.0"
 
 "@qio/prelude@^29.0.5":
@@ -814,13 +814,14 @@
   resolved "https://registry.yarnpkg.com/@qio/prelude/-/prelude-29.0.5.tgz#3884a632777846457fd0d797b14df71b054a2607"
   integrity sha512-2KmczTW6/YE0+4e2nl9OZinxW4g2eSZrJr6qyr//81eMZSQGt+aOIFc1UvQlTqTjYYkENRIzLtSQkYr5XWeKUw==
 
-"@qio/stream@^29.0.5":
-  version "29.0.5"
-  resolved "https://registry.yarnpkg.com/@qio/stream/-/stream-29.0.5.tgz#d39695752fa56dc91b5df8eabe3f8e7d522bfe3a"
-  integrity sha512-IW6Lf6Adzcg/quR9ocNJ5FzZwf12LzzD9wlXaUXCqUoFQdRCTziM+GvclmPIkzgDJZ9PBF21l2SYw1trgQTe5A==
+"@qio/stream@^29.2.1":
+  version "29.2.1"
+  resolved "https://registry.yarnpkg.com/@qio/stream/-/stream-29.2.1.tgz#2fa9f376d285a439035efddc0dda3890e8f64644"
+  integrity sha512-nSnX9ClkZAUjRieH8pdKOQyLnXJLrIBM98va+yQIQJcdPCR/8dcfQ7OKI3xMf7uze0l7AMl3ctmwN/GaA5SzRA==
   dependencies:
-    "@qio/core" "^29.0.5"
+    "@qio/core" "^29.2.1"
     "@qio/prelude" "^29.0.5"
+    debug "^4.1.1"
     standard-data-structures "^4.0.0"
 
 "@semantic-release/commit-analyzer@^6.1.0":
@@ -959,10 +960,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.14.tgz#1c1d6e3c75dba466e0326948d56e8bd72a1903d2"
   integrity sha512-u/SJDyXwuihpwjXy7hOOghagLEV1KdAST6syfnOk6QZAMzZuWZqXy5aYYZbh8Jdpd4escVFP0MvftHNDb9pruA==
 
-"@types/node@^13.1.0":
-  version "13.1.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.1.0.tgz#225cbaac5fdb2b9ac651b02c070d8aa3c37cc812"
-  integrity sha512-zwrxviZS08kRX40nqBrmERElF2vpw4IUTd5khkhBTfFH8AOaeoLVx48EC4+ZzS2/Iga7NevncqnsUSYjM4OWYA==
+"@types/node@^13.1.1":
+  version "13.1.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.1.1.tgz#6d11a8c2d58405b3db9388ab740106cbfa64c3c9"
+  integrity sha512-hx6zWtudh3Arsbl3cXay+JnkvVgCKzCWKv42C9J01N2T2np4h8w5X8u6Tpz5mj38kE3M9FM0Pazx8vKFFMnjLQ==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -6539,10 +6540,10 @@ ts-node@^8.5.4:
     source-map-support "^0.5.6"
     yn "^3.0.0"
 
-ts-scheduler@^8.0.3:
-  version "8.0.3"
-  resolved "https://registry.yarnpkg.com/ts-scheduler/-/ts-scheduler-8.0.3.tgz#d7c9e4f1384b1f686f73e68d1c7d15226f007cb1"
-  integrity sha512-upnZBRy81NJ4eohxR1+peB2vHCsD1qzY7maJFxl3wJcz4rQ2oRbJ0nF+ofldgaOeEfwy6+wQUxIHZ88DXWn+kg==
+ts-scheduler@^8.0.4:
+  version "8.0.4"
+  resolved "https://registry.yarnpkg.com/ts-scheduler/-/ts-scheduler-8.0.4.tgz#216a5da5de401efe20c522f4c69f2f1d8f774d4f"
+  integrity sha512-9FYN7pqLaVtQt+vgwn2R5qamevKU7ca+ucO4zNr+LmsznA9Zeco1dIErKfUZ/D46e7i9zAliLGnyQXZL7uF55Q==
   dependencies:
     checked-exceptions "^1.2.0"
     in-node "^1.0.0"
