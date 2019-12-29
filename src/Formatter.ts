@@ -9,16 +9,19 @@ const log = logger('Formatter')
 /**
  * Reads the file at the provided path and tries to format it
  */
-export const format = (path: string) =>
+export const format = (path: string, options: prettier.Options = {}) =>
   log('path', path).and(
-    FS.open(path, 'w+')
+    FS.open(path, 'r+')
       .chain(fd => log('fs.open', `${fd} ${path}`).const(fd))
       .bracket(fd => FS.close(fd).and(log('fs.close', `${fd} ${path}`)))(fd =>
         FS.readFile(fd)
           .do(log('fs.readFile', `${fd} ${path}`))
           .chain(buffer => {
             const content = buffer.toString()
-            const fContent = prettier.format(content, {filepath: path})
+            const fContent = prettier.format(content, {
+              ...options,
+              filepath: path
+            })
 
             return QIO.if(
               content === fContent,

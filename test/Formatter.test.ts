@@ -43,12 +43,12 @@ describe('format', () => {
     )
   })
 
-  it('should open file with w+', () => {
+  it('should open file with r+', () => {
     const env = mockEnv()
     testRuntime(testScheduler({bailout: 200})).unsafeExecuteSync(
       format('./xyz.ts').provide(env)
     )
-    env.fs.__spy__.open.should.have.been.first.called.with('./xyz.ts', 'w+')
+    env.fs.__spy__.open.should.have.been.first.called.with('./xyz.ts', 'r+')
   })
 
   it('should log input files', () => {
