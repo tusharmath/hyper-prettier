@@ -1,5 +1,6 @@
 import {Managed, QIO} from '@qio/core'
 
+import {createChunks} from './CreateChunks'
 import {EnvForker, EnvMasterSocket} from './Env'
 import {logger} from './Logger'
 import {QWorker} from './QWorker'
@@ -44,12 +45,18 @@ export const masterProgram = (filePaths: string[], concurrency: number) =>
             log(`file count`, `${filePaths.length}`)
               .and(
                 QIO.seq(
-                  filePaths.map(file =>
-                    S.send(file).and(log(`send`, `${file}`))
+                  createChunks(filePaths, concurrency).map(data =>
+                    QIO.if(
+                      data.length > 0,
+                      S.send(data.join('\n')).and(
+                        log(`sent`, `${data.join(',')}`)
+                      ),
+                      QIO.void()
+                    )
                   )
                 )
               )
-              .and(log(`file sent`, `${filePaths.length}`))
+              .and(log(`sent count`, `${filePaths.length}`))
           )
         )
       )

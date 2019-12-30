@@ -11,7 +11,7 @@ const log = logger('WorkerProgram')
 const workerSocket = QIO.accessM((_: EnvWorkerSocket) =>
   _.cluster.workerSocket()
 )
-const format = (path: string) =>
+export const format = (path: string) =>
   QIO.accessM((_: EnvFormatter) => _.formatter.format(path))
 
 const mWorkerSocket = Managed.make(
@@ -27,12 +27,13 @@ export const workerProgram = () =>
       mWorkerSocket.use(
         S =>
           Stream.produce(S.receive).mapM(buffer => {
-            const path = buffer.toString()
+            const filePaths = buffer.toString().split('\n')
 
-            return log('recv', path)
-              .and(format(path))
-              .and(log('format', `${path} OK`))
-              .and(S.send('1'))
+            return log('recv', filePaths.join(',')).and(
+              QIO.par(filePaths.map(format))
+                .and(log('format', `${filePaths.join(',')} OK`))
+                .and(S.send('1'))
+            )
           }).drain
       )
     )
