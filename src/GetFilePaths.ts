@@ -1,9 +1,15 @@
+import {QIO, Ref} from '@qio/core'
 import {Stream} from '@qio/stream'
-export const getFilePaths = Stream.fromEventEmitter<Buffer>(
-  process.stdin,
-  'data'
-).chain(M =>
-  M.use(S => S.map(_ => _.toString()).foldLeft('', (a, b) => a + b)).map(_ =>
-    _.split('\n')
+
+// tslint:disable-next-line: invalid-void
+const end = QIO.uninterruptible<void>(res => process.stdin.on('end', res))
+const src = Stream.fromEventEmitter<string>(process.stdin, 'data')
+
+export const getFilePaths = Ref.of('')
+  .chain(ref =>
+    src
+      .forEach(_ => ref.update(s => s + _))
+      .fork()
+      .chain(F => end.and(F.abort).and(ref.read))
   )
-)
+  .map(_ => _.split('\n'))
