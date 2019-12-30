@@ -27,16 +27,18 @@ const workerSocket = (msg: string[]) => {
 }
 const mockEnv = (_ = {receive: ['A', 'B', 'C']}) => {
   const worker = workerSocket(_.receive)
+  const format = spy()
 
   return {
     __spy__: {
+      format,
       worker: worker.__spy__
     },
     cluster: {
       workerSocket: QIO.encase(() => worker)
     },
     formatter: {
-      format: QIO.void
+      format: QIO.encase(format)
     },
     logger: testLogger(),
     worker: {id: QIO.resolve(0)}
@@ -44,12 +46,10 @@ const mockEnv = (_ = {receive: ['A', 'B', 'C']}) => {
 }
 describe('workerProgram', () => {
   it('should start the program', () => {
-    const L = testLogger()
-    testRuntime().unsafeExecuteSync(
-      workerProgram().provide({...mockEnv(), logger: L})
-    )
+    const env = mockEnv()
+    testRuntime().unsafeExecuteSync(workerProgram().provide(env))
 
-    assert.deepStrictEqual(L.stdout, [
+    assert.deepStrictEqual(env.logger.stdout, [
       'HPrettierWorkerProgram_000 program: START',
       'HPrettierWorkerProgram_000 socket: ACQUIRED',
       'HPrettierWorkerProgram_000 recv: A',
@@ -62,12 +62,10 @@ describe('workerProgram', () => {
   })
 
   it('should open socket', () => {
-    const L = testLogger()
-    testRuntime().unsafeExecuteSync(
-      workerProgram().provide({...mockEnv(), logger: L})
-    )
+    const env = mockEnv()
+    testRuntime().unsafeExecuteSync(workerProgram().provide(env))
 
-    assert.deepStrictEqual(L.stdout, [
+    assert.deepStrictEqual(env.logger.stdout, [
       'HPrettierWorkerProgram_000 program: START',
       'HPrettierWorkerProgram_000 socket: ACQUIRED',
       'HPrettierWorkerProgram_000 recv: A',
@@ -80,20 +78,15 @@ describe('workerProgram', () => {
   })
 
   it('should format the files', () => {
-    const format = spy()
-    testRuntime().unsafeExecuteSync(
-      workerProgram().provide({
-        ...mockEnv(),
-        formatter: {format: QIO.encase(format)}
-      })
-    )
+    const env = mockEnv()
+    testRuntime().unsafeExecuteSync(workerProgram().provide(env))
 
-    format.should.have.been.first.called.with('A')
+    env.__spy__.format.should.have.been.first.called.with('A')
   })
 
   it('should send update count back to master', () => {
     const env = mockEnv()
-    testRuntime().unsafeExecuteSync(workerProgram().provide({...env}))
+    testRuntime().unsafeExecuteSync(workerProgram().provide(env))
 
     env.__spy__.worker.send.should.have.been.first.called.with.exactly('1')
   })
