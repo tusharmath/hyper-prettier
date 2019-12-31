@@ -11,3 +11,4 @@ docs/
 *.todo
 .vscode/
 .metals/
+REPL**
